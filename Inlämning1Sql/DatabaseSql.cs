@@ -47,5 +47,32 @@ namespace Inlämning1Sql
             }
         }
 
+        public long ExecuteSQL(string sqlString, params(string,string) [] parameters)
+        {
+            long rowsAffacted = 0;
+
+            var connString = string.Format(ConnectionString, DatabaseName);
+
+            using (var cnn = new SqlConnection(connString))
+            {
+                cnn.Open();
+                using (var command = new SqlCommand(sqlString, cnn))
+                {
+                    SetParameters(parameters, command);
+                    rowsAffacted = command.ExecuteNonQuery();
+
+                }
+
+            }
+
+            return rowsAffacted;
+        }
+
+        internal void CreateDatabase(string name, bool OpenNewDatabase = false)
+        {
+            ExecuteSQL("CREATE DATABASE " + name);
+            if (OpenNewDatabase) DatabaseName = name;
+        }
+
     }
 }
