@@ -10,8 +10,8 @@ namespace Inlämning1Sql
 {
     class DatabaseSql
     {
-        private string ConnectionString { get; set; } = @"Data Source=.\SQLExpress;Integrated Security=true;database={0}";
-        private string DatabaseName { get; set; } = "";
+        internal string ConnectionString { get; set; } = @"Data Source=.\SQLExpress;Integrated Security=true;database={0}";
+        internal string DatabaseName { get; set; } = "";
 
         public DataTable GetDataTable(string sqlString, params(string,string) [] parameters)
         {
@@ -51,6 +51,8 @@ namespace Inlämning1Sql
         {
             long rowsAffacted = 0;
 
+            try {
+
             var connString = string.Format(ConnectionString, DatabaseName);
 
             using (var cnn = new SqlConnection(connString))
@@ -65,6 +67,12 @@ namespace Inlämning1Sql
 
             }
 
+            }
+            catch (System.Exception ex)
+            {
+                System.Console.WriteLine(ex.Message);
+
+            }
             return rowsAffacted;
         }
 
@@ -73,6 +81,8 @@ namespace Inlämning1Sql
             ExecuteSQL("CREATE DATABASE " + name);
             if (OpenNewDatabase) DatabaseName = name;
         }
+
+      
 
     }
 }
