@@ -8,30 +8,36 @@ namespace Inlämning1Sql
 {
     class GenealogyCRUD
     {
-        private DatabaseSql db = new DatabaseSql();
-
-
-        internal string ConnectionString { get; set; } = @"Data Source=.\SQLExpress;Integrated Security=true;database={0}";
+        private DatabaseSql db = new DatabaseSql(); // kanske bättre att bara göra denna statisk? 
         public string DatabaseName { get; set; } = "Genealogy";
         public int MaxRows { get; set; } = 10;
         public string OrderBy { get; set; } = "surName";
         public void Create (Person person)
         {
-            if(DoesPersonExist(person.FirstName)) 
+            if(!DoesPersonExist(person.FirstName)) 
             {
-                Console.WriteLine($"A person with the name {person.FirstName} already exists"); 
+                db.DatabaseName = DatabaseName;
+                db.ExecuteSQL(@$"INSERT INTO People (firstName, lastName, birthDate, deathDate)
+                                VALUES(@firstName, @lastName, @birthDate, @deathDate)",
+                                ("@firstName", person.FirstName),
+                                ("@lastName", person.LastName),
+                                ("@birthDate", person.BirthDate),
+                                ("@deathDate", person.DeathDate));                        
             }
             else
             {
-                db.DatabaseName = DatabaseName;
-                db.ExecuteSQL(@$"INSERT INTO People (firstName, lastName, birthDate, deathDate, dadID, momID)
-                                VALUES('{person.FirstName}','{person.LastName}','{person.BirthDate}',
-                                        '{person.DeathDate}',{person.DadID}, {person.MomID})");
+                Console.WriteLine($"A person with the name: {person.FirstName} already exists");
+
             }
 
         }
+
         public void Delete (Person person)
         {
+
+            db.DatabaseName = DatabaseName;
+            db.ExecuteSQL(@$"DELETE FROM people WHERE firstName = @firstName",
+                ("@firstName",person.FirstName));
 
         }
 
@@ -77,14 +83,6 @@ namespace Inlämning1Sql
 
         }
 
-        /* public List<Person> List (string filter = "firstName LIKE @input", string paramValue)
-        {
-            List<Person> list = new List<Person>();
-            return list; 
-
-        }
-        */
-
         public Person Read (string name)
         {
 
@@ -97,12 +95,43 @@ namespace Inlämning1Sql
 
         }
 
-        internal void CreateDatabase(string name, bool OpenNewDatabase = false)
+        internal void CreateDatabase(string name)
         {
-            db.DatabaseName = DatabaseName;
+            string sqlCmd = ("CREATE DATABASE " + name);
 
-            db.ExecuteSQL("CREATE DATABASE " + name);
-            if (OpenNewDatabase) DatabaseName = name;
+            if (!DoesDatabaseExist(name))
+            {
+                db.ExecuteSQL(sqlCmd);
+            }
+        }
+
+        internal bool DoesDatabaseExist(string databaseName)
+        {
+            string doesExist = "";
+
+            var sqlCmd = "SELECT COUNT(*) AS data FROM master.dbo.sysdatabases WHERE name=@database";
+
+            var files = db.GetDataTable(sqlCmd, ("@database",databaseName));
+
+            foreach (DataRow row in files.Rows)
+            {
+                doesExist = $"{row["data"]}";
+            }
+
+            if (doesExist == "1")
+
+            /* Detta dör dock om databasen har flera tabeller, då får man konvertera till int, samt try catch på det osv.
+             * Då är det bättre att använda sqlCmd.ExecuteScalar
+             * Som det står om här: https://stackoverflow.com/questions/50368114/check-if-database-exists-mssql-c-sharp
+             */
+
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
 
         internal void CreateTable(string name, string fields)

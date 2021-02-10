@@ -7,13 +7,13 @@ namespace Inlämning1Sql
     {
         static void Main(string[] args)
         {
+            GenealogyCRUD crud = new GenealogyCRUD();
 
-            // skapar databas
-            /*
-            crud.DatabaseName = "Master";
-            crud.ExecuteSQL("CREATE Database Genealogy");
-            crud.DatabaseName = "Genealogy";
-            */
+            Person theo = new Person("Natalia", "frödin", "1994", "aldrig", 4, 6);
+
+
+            crud.Create(theo);
+           
 
             // skapar tabell 
             /*
@@ -34,11 +34,11 @@ namespace Inlämning1Sql
                                  VALUES('David','Frödin','1994', '2122', 2, 3)");
             */
 
-            GenealogyCRUD crud = new GenealogyCRUD();
+            //GenealogyCRUD crud = new GenealogyCRUD();
 
-            Person Theo = new Person("theo", "frödin", "1994", "aldrig", 4, 6);
+            //Person Theo = new Person("theo", "frödin", "1994", "aldrig", 4, 6);
 
-            crud.Create(Theo);
+            // crud.Create(Theo);
 
 
            

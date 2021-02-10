@@ -11,7 +11,7 @@ namespace Inlämning1Sql
     class DatabaseSql
     {
         internal string ConnectionString { get; set; } = @"Data Source=.\SQLExpress;Integrated Security=true;database={0}";
-        internal string DatabaseName { get; set; } = "";
+        internal string DatabaseName { get; set; } = "Master";
 
         public DataTable GetDataTable(string sqlString, params(string,string) [] parameters)
         {
@@ -76,11 +76,7 @@ namespace Inlämning1Sql
             return rowsAffacted;
         }
 
-        internal void CreateDatabase(string name, bool OpenNewDatabase = false)
-        {
-            ExecuteSQL("CREATE DATABASE " + name);
-            if (OpenNewDatabase) DatabaseName = name;
-        }
+      
 
       
 
