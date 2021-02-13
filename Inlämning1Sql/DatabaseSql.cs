@@ -39,7 +39,7 @@ namespace Inlämning1Sql
             return dt;
         }
 
-        private static void SetParameters((string, string)[] parameters, SqlCommand command)
+        private static void SetParameters((string, object)[] parameters, SqlCommand command)
         {
             foreach (var item in parameters)
             {
@@ -47,7 +47,7 @@ namespace Inlämning1Sql
             }
         }
 
-        public long ExecuteSQL(string sqlString, params(string,string) [] parameters)
+        public long ExecuteSQL(string sqlString, params(string,object) [] parameters)
         {
             long rowsAffacted = 0;
 

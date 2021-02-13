@@ -29,6 +29,14 @@ namespace Inlämning1Sql
 
         }
 
+        public override string ToString()
+        {
+
+            return @$"{FirstName} {LastName}";
+
+    
+        }
+
 
 
     }

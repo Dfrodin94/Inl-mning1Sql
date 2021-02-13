@@ -10,19 +10,20 @@ namespace Inlämning1Sql
     {
         private DatabaseSql db = new DatabaseSql(); // kanske bättre att bara göra denna statisk? 
         public string DatabaseName { get; set; } = "Genealogy";
-        public int MaxRows { get; set; } = 10;
-        public string OrderBy { get; set; } = "surName";
+
         public void Create (Person person)
         {
             if(!DoesPersonExist(person.FirstName)) 
             {
                 db.DatabaseName = DatabaseName;
-                db.ExecuteSQL(@$"INSERT INTO People (firstName, lastName, birthDate, deathDate)
-                                VALUES(@firstName, @lastName, @birthDate, @deathDate)",
+                db.ExecuteSQL(@$"INSERT INTO People (firstName, lastName, birthDate, deathDate, momID, dadID)
+                                VALUES(@firstName, @lastName, @birthDate, @deathDate, @momID, @dadID)",
                                 ("@firstName", person.FirstName),
                                 ("@lastName", person.LastName),
                                 ("@birthDate", person.BirthDate),
-                                ("@deathDate", person.DeathDate));                        
+                                ("@deathDate", person.DeathDate),
+                                ("@momID",person.MomID),
+                                ("@dadID",person.DadID));                        
             }
             else
             {
@@ -32,7 +33,7 @@ namespace Inlämning1Sql
 
         }
 
-        public void Delete (Person person)
+        public void Delete (Person person)// TODO: ändra till ID sen
         {
 
             db.DatabaseName = DatabaseName;
@@ -68,30 +69,109 @@ namespace Inlämning1Sql
 
         public bool DoesPersonExist(int id)
         {
-            bool b = true;
-            return b;
+            db.DatabaseName = DatabaseName;
+            List<Person> personList = List($"ID = '{id}'");
+
+            foreach (Person p in personList)
+            {
+                if (p.Id.Equals(id))
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+
+            }
+
+            return false;
+        }
+
+        public Person GetFather(Person person)
+        {
+            db.DatabaseName = DatabaseName;
+            List<Person> personList = List($"ID = '{person.DadID}'");
+            var aPerson = new Person();
+
+            foreach (Person p in personList)
+            {
+                if (p.Id.Equals(person.DadID))
+                {
+                    aPerson = p;
+                }
+
+            }
+
+            return aPerson;
+
+
 
         }
 
-        public void GetFather(Person person)
+        public Person GetMother(Person person)
         {
+
+            db.DatabaseName = DatabaseName;
+            List<Person> personList = List($"ID = '{person.MomID}'");
+            var aPerson = new Person();
+
+
+            foreach (Person p in personList)
+            {
+                if (p.Id.Equals(person.MomID))
+                {
+                    aPerson = p;
+                }
+
+            }
+
+            return aPerson;
 
         }
 
-        public void GetMother(Person person)
+        public List<Person> GetChildren (Person person)
         {
+
+            db.DatabaseName = DatabaseName;
+            List<Person> personList = List($"momID = '{person.Id}' OR dadID = '{person.Id}'");
+            return personList;
 
         }
 
-        public Person Read (string name)
+        public Person Read (string firstName)
         {
+            db.DatabaseName = DatabaseName;
+            DataTable dt;
 
-            Person p = new Person();
-            return p;
+            dt = db.GetDataTable(@"SELECT TOP 1 * FROM People WHERE firstName =@firstName",
+                                ("@firstName", firstName));
+
+            if (dt.Rows.Count == 0)
+            {
+                return null;
+            }
+
+            return GetPersonObject(dt.Rows[0]);
+             
         }
 
         public void Update(Person person)
         {
+            db.DatabaseName = DatabaseName;
+            List($"firstName = '{person.FirstName}'");
+
+            db.ExecuteSQL(@"UPDATE People SET
+                            firstName=@firstName, lastName=@lastName,birthDate=@birthDate, deathDate=@deathDate,
+                            dadID=@dadID, momID=@momID WHERE ID = @ID",
+                            ("@firstName",person.FirstName),
+                            ("@lastName",person.LastName),
+                            ("@birthDate",person.BirthDate),
+                            ("@deathDate", person.DeathDate),
+                            ("@dadID", person.DadID),
+                            ("@momID", person.MomID),
+                            ("@ID", person.Id));
+
 
         }
 
@@ -134,33 +214,55 @@ namespace Inlämning1Sql
             }
         }
 
-        internal void CreateTable(string name, string fields)
+        internal void AddColumn(string name, string field)
         {
 
             db.DatabaseName = DatabaseName;
-
-            db.ExecuteSQL($"CREATE TABLE {name} ({fields});");
+            db.ExecuteSQL($"ALTER TABLE People ADD {name} {field};");
         }
 
-        public List<Person> List(string filter = "", string orderBy = "lastName", int max = 10)
+        internal void DeleteColumn(string name)
         {
-            var db = new DatabaseSql
-            {
-                DatabaseName = DatabaseName
-            };
+            db.DatabaseName = DatabaseName;
+            db.ExecuteSQL($"ALTER TABLE People DROP COLUMN {name};");
 
-            var sql = "SELECT";
-            if (max > 0) sql += " TOP " + max.ToString();
-            sql += "* From People";
-            if (filter != "") sql += " WHERE " + filter;
-            if (orderBy != "") sql += " ORDER BY " + orderBy;
-            var data = db.GetDataTable(sql);
-            var lst = new List<Person>();
+        }
+
+        internal void CreateTablePeople()
+        {
+            db.ExecuteSQL(@"USE [Genealogy]
+                            CREATE TABLE [dbo].[People](
+                                [ID] [int] IDENTITY(1,1) NOT NULL,
+                                [firstName] [nvarchar](255) NULL,
+                                [lastName] [nvarchar](255) NULL,
+                                [birthDate] [nvarchar](255) NULL,
+                                [deathDate] [nvarchar](255) NULL,
+                                [dadID] [int] NULL,
+                                [momID] [int] NULL
+                            ) ON [PRIMARY]");
+
+
+        }
+
+        public List<Person> List(string filter = "", string orderby = "")
+        {
+            db.DatabaseName = DatabaseName;
+
+            // TODO: Här är det kaoz, måste ha parameterar, fixa sen! 
+            var sqlCmd = "SELECT";
+            sqlCmd += "* FROM People";
+            if (filter != "") sqlCmd += " WHERE " + filter;
+            if (orderby != "") sqlCmd += " ORDER BY " + orderby;
+
+            // Console.WriteLine(sqlCmd); TESTGREJ
+
+            var data = db.GetDataTable(sqlCmd);
+            var list = new List<Person>();
             foreach (DataRow row in data.Rows)
             {
-                lst.Add(GetPersonObject(row));
+                list.Add(GetPersonObject(row));
             }
-            return lst;
+            return list;
         }
 
         private static Person GetPersonObject(DataRow row)
@@ -179,8 +281,6 @@ namespace Inlämning1Sql
        
 
     }
-
-
 
 
     }

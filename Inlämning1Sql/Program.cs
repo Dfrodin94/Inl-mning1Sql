@@ -9,46 +9,34 @@ namespace Inlämning1Sql
         {
             GenealogyCRUD crud = new GenealogyCRUD();
 
-            Person theo = new Person("Natalia", "frödin", "1994", "aldrig", 4, 6);
-
-
-            crud.Create(theo);
-           
-
-            // skapar tabell 
-            /*
-            crud.ExecuteSQL(@"USE [Genealogy]
-                            CREATE TABLE [dbo].[People](
-                                [ID] [int] IDENTITY(1,1) NOT NULL,
-                                [firstName] [nvarchar](255) NULL,
-                                [lastName] [nvarchar](255) NULL,
-                                [birthDate] [nvarchar](255) NULL,
-                                [deathDate] [nvarchar](255) NULL,
-                                [dadID] [int] NULL,
-                                [momID] [int] NULL
-                            ) ON [PRIMARY]");
-            */
-
-            //lägger till personer i databas
-            /* crud.ExecuteSQL(@"INSERT INTO People (firstName, lastName, birthDate, deathDate, dadID, momID)
-                                 VALUES('David','Frödin','1994', '2122', 2, 3)");
-            */
-
-            //GenealogyCRUD crud = new GenealogyCRUD();
-
-            //Person Theo = new Person("theo", "frödin", "1994", "aldrig", 4, 6);
-
-            // crud.Create(Theo);
-
-
-           
+            Person theo = new Person("king", "frödin", "1994", "aldrig", 1, 7);
+            Person momTheo = new Person("Gudinna", "frödin", "1994", "aldrig", 1, 7);
+            momTheo.Id = 6;
+            crud.Create(momTheo);
+            Person dadTheo = new Person();
 
 
 
 
 
 
+            //Console.WriteLine(momTheo.ToString());
+            //Console.WriteLine(dadTheo.ToString());
 
-}
+            List<Person> aList = crud.List("","firstName");
+
+            foreach(Person p in aList)
+
+            {
+                Console.WriteLine(p.ToString());
+            }
+
+
+    
+
+
+
+
+        }
 }
 }
