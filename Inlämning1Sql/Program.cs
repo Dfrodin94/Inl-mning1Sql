@@ -8,6 +8,8 @@ namespace Inlämning1Sql
         static void Main(string[] args)
         {
             GenealogyCRUD crud = new GenealogyCRUD();
+            // crud.CreateDatabase("Genealogy");
+            // crud.CreateTablePeople();
           
             Person david = new Person("David", "Frödin", "1994", "alive", 0, 0);
             Person theo = new Person("Theo", "Frödin", "2010", "alive", 0, 0);
@@ -95,22 +97,6 @@ namespace Inlämning1Sql
             {
                 Console.WriteLine(p.ToString());
             }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
