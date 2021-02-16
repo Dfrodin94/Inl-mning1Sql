@@ -76,36 +76,41 @@ namespace Inlämning1Sql
             nadja.DadID = vladimir.Id;
             crud.Update(nadja);
 
-            List<Person> people = crud.List("firstName LIKE 'D%'", "");
-            foreach(Person p in people)
-            {
-                Console.WriteLine(p.ToString());
-            }
-
-            people = crud.List("birthDate = '1994'", "");
+            List<Person> people = crud.UserListFirstLetter("D"); // söka på bokstav
             foreach (Person p in people)
             {
                 Console.WriteLine(p.ToString());
             }
 
-            people = crud.List("momID = 0 OR dadID = 0", "");
+            people = crud.UserListWhere("birthDate", "1994"); // söka på födelsedatum 
             foreach (Person p in people)
             {
                 Console.WriteLine(p.ToString());
             }
 
-            Person momDavid = crud.GetMother(david);
+            people = crud.UserListWhereOr("momID", "0", "dadID", "0"); // de utan päron 
+            foreach (Person p in people)
+            {
+                Console.WriteLine(p.ToString());
+            }
+
+            people = crud.UserListWhere("MomID", natalia.Id.ToString()); // de med samma mamma 
+            foreach (Person p in people)
+            {
+                Console.WriteLine(p.ToString());
+            }
+
+            Console.WriteLine("");
+
+            people = crud.UserListOrderbyBirthPlace();
+            foreach (Person p in people)
+            {
+                Console.WriteLine($"{p.BirthPlace} {p.ToString()}");
+            }
+
+
+            Person momDavid = crud.GetMother(david); // hitta mamma 
             Console.WriteLine(momDavid.ToString());
-
-            people = crud.List($"momID = {natalia.Id}", "");
-            foreach (Person p in people)
-            {
-                Console.WriteLine(p.ToString());
-            }
-
-            
-
-            crud.Update(david);
 
 
         }
