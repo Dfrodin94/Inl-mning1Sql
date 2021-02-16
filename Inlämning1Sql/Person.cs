@@ -32,7 +32,7 @@ namespace Inlämning1Sql
         public override string ToString()
         {
 
-            return @$"Name: {FirstName} SurName:{LastName} ID: {Id}";
+            return @$"Name: {FirstName} {LastName} ID: {Id}";
 
     
         }

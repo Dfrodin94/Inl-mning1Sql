@@ -68,16 +68,48 @@ namespace Inlämning1Sql
             nadja.MomID = galina.Id;
             nadja.DadID = vladimir.Id;
             crud.Update(nadja);
-           
 
-            
-            
+            List<Person> people = crud.List("firstName LIKE 'D%'", "");
+            foreach(Person p in people)
+            {
+                Console.WriteLine(p.ToString());
+            }
+
+            people = crud.List("birthDate = '1994'", "");
+            foreach (Person p in people)
+            {
+                Console.WriteLine(p.ToString());
+            }
+
+            people = crud.List("momID = 0 OR dadID = 0", "");
+            foreach (Person p in people)
+            {
+                Console.WriteLine(p.ToString());
+            }
+
+            Person momDavid = crud.GetMother(david);
+            Console.WriteLine(momDavid.ToString());
+
+            people = crud.List($"momID = {natalia.Id}", "");
+            foreach (Person p in people)
+            {
+                Console.WriteLine(p.ToString());
+            }
 
 
 
- 
 
-    
+
+
+
+
+
+
+
+
+
+
+
 
 
 

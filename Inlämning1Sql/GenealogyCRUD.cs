@@ -248,15 +248,33 @@ namespace Inlämning1Sql
         {
             db.DatabaseName = DatabaseName;
 
-            // TODO: Här är det kaoz, måste ha parameterar, fixa sen! 
             var sqlCmd = "SELECT";
             sqlCmd += "* FROM People";
             if (filter != "") sqlCmd += " WHERE " + filter;
             if (orderby != "") sqlCmd += " ORDER BY " + orderby;
 
-            // Console.WriteLine(sqlCmd); TESTGREJ
-
             var data = db.GetDataTable(sqlCmd);
+            var list = new List<Person>();
+            foreach (DataRow row in data.Rows)
+            {
+                list.Add(GetPersonObject(row));
+            }
+            return list;
+        }
+
+        public List<Person> List2(string filter = "", string orderby = "")
+        {
+            db.DatabaseName = DatabaseName;
+
+            // TODO: Här är det kaoz, måste ha parameterar, fixa sen! 
+            var sqlCmd = "SELECT";
+            sqlCmd += "* FROM People";
+            if (filter != "") sqlCmd += " WHERE firstName = @firstName";
+            if (orderby != "") sqlCmd += " ORDER BY " + orderby;
+
+            Console.WriteLine(sqlCmd); 
+            
+            var data = db.GetDataTable(sqlCmd, ("@firstName", filter));
             var list = new List<Person>();
             foreach (DataRow row in data.Rows)
             {

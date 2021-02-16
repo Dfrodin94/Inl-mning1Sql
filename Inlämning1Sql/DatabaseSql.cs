@@ -26,6 +26,7 @@ namespace Inlämning1Sql
                     foreach(var item in parameters)
                     {
                         command.Parameters.AddWithValue(item.Item1, item.Item2);
+
                     }
 
                     using (var adapter = new SqlDataAdapter(command))
