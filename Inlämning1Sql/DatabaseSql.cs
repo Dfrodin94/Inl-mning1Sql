@@ -8,12 +8,12 @@ using System.Text;
 
 namespace Inlämning1Sql
 {
-    class DatabaseSql
+    class DatabaseSql : GenealogyCRUD
     {
         internal string ConnectionString { get; set; } = @"Data Source=.\SQLExpress;Integrated Security=true;database={0}";
         internal string DatabaseName { get; set; } = "Master";
 
-        public DataTable GetDataTable(string sqlString, params(string,string) [] parameters)
+        public DataTable GetDataTable(string sqlString, params (string, string)[] parameters)
         {
             var dt = new DataTable();
             var connString = string.Format(ConnectionString, DatabaseName);
@@ -21,9 +21,9 @@ namespace Inlämning1Sql
             using (var cnn = new SqlConnection(connString))
             {
                 cnn.Open();
-                using(var command = new SqlCommand(sqlString,cnn))
+                using (var command = new SqlCommand(sqlString, cnn))
                 {
-                    foreach(var item in parameters)
+                    foreach (var item in parameters)
                     {
                         command.Parameters.AddWithValue(item.Item1, item.Item2);
 
@@ -48,25 +48,26 @@ namespace Inlämning1Sql
             }
         }
 
-        public long ExecuteSQL(string sqlString, params(string,object) [] parameters)
+        public long ExecuteSQL(string sqlString, params (string, object)[] parameters)
         {
             long rowsAffacted = 0;
 
-            try {
-
-            var connString = string.Format(ConnectionString, DatabaseName);
-
-            using (var cnn = new SqlConnection(connString))
+            try
             {
-                cnn.Open();
-                using (var command = new SqlCommand(sqlString, cnn))
+
+                var connString = string.Format(ConnectionString, DatabaseName);
+
+                using (var cnn = new SqlConnection(connString))
                 {
-                    SetParameters(parameters, command);
-                    rowsAffacted = command.ExecuteNonQuery();
+                    cnn.Open();
+                    using (var command = new SqlCommand(sqlString, cnn))
+                    {
+                        SetParameters(parameters, command);
+                        rowsAffacted = command.ExecuteNonQuery();
+
+                    }
 
                 }
-
-            }
 
             }
             catch (System.Exception ex)
@@ -77,9 +78,9 @@ namespace Inlämning1Sql
             return rowsAffacted;
         }
 
-      
 
-      
+
+
 
     }
 }

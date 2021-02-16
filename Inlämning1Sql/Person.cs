@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Inlämning1Sql
+﻿namespace Inlämning1Sql
 {
-    class Person
+    internal class Person
     {
-        public int Id {get; set;}
+        public int Id { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string BirthDate { get; set; }
@@ -26,18 +22,11 @@ namespace Inlämning1Sql
 
         public Person()
         {
-
         }
 
         public override string ToString()
         {
-
             return @$"Name: {FirstName} {LastName} ID: {Id}";
-
-    
         }
-
-
-
     }
 }
