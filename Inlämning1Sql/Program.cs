@@ -3,12 +3,12 @@ using System.Collections.Generic;
 
 namespace Inlämning1Sql
 {
-    class Program
+    internal class Program
     {
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
             GenealogyCRUD crud = new GenealogyCRUD();
-          
+
             Person david = new Person("David", "Frödin", "1994", "alive", 0, 0);
             Person theo = new Person("Theo", "Frödin", "2010", "alive", 0, 0);
             Person natalia = new Person("Natalia", "Frödin", "1974", "alive", 0, 0);
@@ -69,51 +69,32 @@ namespace Inlämning1Sql
             nadja.DadID = vladimir.Id;
             crud.Update(nadja);
 
-            List<Person> people = crud.List("firstName LIKE 'D%'", "");
-            foreach(Person p in people)
-            {
-                Console.WriteLine(p.ToString());
-            }
-
-            people = crud.List("birthDate = '1994'", "");
+            List<Person> people = crud.UserListFirstLetter("D"); // söka på bokstav
             foreach (Person p in people)
             {
                 Console.WriteLine(p.ToString());
             }
 
-            people = crud.List("momID = 0 OR dadID = 0", "");
+            people = crud.UserListWhere("birthDate", "1994"); // söka på födelsedatum 
             foreach (Person p in people)
             {
                 Console.WriteLine(p.ToString());
             }
 
-            Person momDavid = crud.GetMother(david);
+            people = crud.UserListWhereOr("momID", "0", "dadID", "0"); // de utan päron 
+            foreach (Person p in people)
+            {
+                Console.WriteLine(p.ToString());
+            }
+
+            people = crud.UserListWhere("MomID", natalia.Id.ToString()); // de med samma mamma 
+            foreach (Person p in people)
+            {
+                Console.WriteLine(p.ToString());
+            }
+
+            Person momDavid = crud.GetMother(david); // hitta mamma 
             Console.WriteLine(momDavid.ToString());
-
-            people = crud.List($"momID = {natalia.Id}", "");
-            foreach (Person p in people)
-            {
-                Console.WriteLine(p.ToString());
-            }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         }
-}
+    }
 }

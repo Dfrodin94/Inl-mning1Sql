@@ -1,19 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.SqlClient;
-using System.Text;
 
 namespace Inlämning1Sql
 {
-    class GenealogyCRUD
+    internal class GenealogyCRUD
     {
-        private DatabaseSql db = new DatabaseSql(); // kanske bättre att bara göra denna statisk? 
+        private DatabaseSql db = new DatabaseSql();
+
         public string DatabaseName { get; set; } = "Genealogy";
 
-        public void Create (Person person)
+        public void Create(Person person)
         {
-            if(!DoesPersonExist(person.FirstName)) 
+            if (!DoesPersonExist(person.FirstName))
             {
                 db.DatabaseName = DatabaseName;
                 db.ExecuteSQL(@$"INSERT INTO People (firstName, lastName, birthDate, deathDate, momID, dadID)
@@ -22,59 +21,30 @@ namespace Inlämning1Sql
                                 ("@lastName", person.LastName),
                                 ("@birthDate", person.BirthDate),
                                 ("@deathDate", person.DeathDate),
-                                ("@momID",person.MomID),
-                                ("@dadID",person.DadID));                        
+                                ("@momID", person.MomID),
+                                ("@dadID", person.DadID));
             }
             else
             {
                 Console.WriteLine($"A person with the name: {person.FirstName} already exists");
-
             }
-
         }
 
-        public void Delete (Person person)// TODO: ändra till ID sen
+        public void Delete(Person person)
         {
-
             db.DatabaseName = DatabaseName;
-            db.ExecuteSQL(@$"DELETE FROM people WHERE firstName = @firstName",
-                ("@firstName",person.FirstName));
-
+            db.ExecuteSQL(@$"DELETE FROM people WHERE ID = @ID",
+                ("@ID", person.Id));
         }
 
-        public bool DoesPersonExist(string firstName)
+        private bool DoesPersonExist(string firstName)
         {
             db.DatabaseName = DatabaseName;
             List<Person> personList = List($"firstName = '{firstName}'");
-           
-            foreach (Person p in personList)
-            {
-                if(p.FirstName.Equals(firstName)) 
-                    {
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
-                
-            }
-
-            return false;
-
-            
-
-           
-        } // funkar, men ej snygg lösning
-
-        public bool DoesPersonExist(int id)
-        {
-            db.DatabaseName = DatabaseName;
-            List<Person> personList = List($"ID = '{id}'");
 
             foreach (Person p in personList)
             {
-                if (p.Id.Equals(id))
+                if (p.FirstName.Equals(firstName))
                 {
                     return true;
                 }
@@ -82,7 +52,6 @@ namespace Inlämning1Sql
                 {
                     return false;
                 }
-
             }
 
             return false;
@@ -100,22 +69,16 @@ namespace Inlämning1Sql
                 {
                     aPerson = p;
                 }
-
             }
 
             return aPerson;
-
-
-
         }
 
         public Person GetMother(Person person)
         {
-
             db.DatabaseName = DatabaseName;
             List<Person> personList = List($"ID = '{person.MomID}'");
             var aPerson = new Person();
-
 
             foreach (Person p in personList)
             {
@@ -123,23 +86,19 @@ namespace Inlämning1Sql
                 {
                     aPerson = p;
                 }
-
             }
 
             return aPerson;
-
         }
 
-        public List<Person> GetChildren (Person person)
+        public List<Person> GetChildren(Person person)
         {
-
             db.DatabaseName = DatabaseName;
             List<Person> personList = List($"momID = '{person.Id}' OR dadID = '{person.Id}'");
             return personList;
-
         }
 
-        public Person Read (string firstName)
+        public Person Read(string firstName)
         {
             db.DatabaseName = DatabaseName;
             DataTable dt;
@@ -153,7 +112,6 @@ namespace Inlämning1Sql
             }
 
             return GetPersonObject(dt.Rows[0]);
-             
         }
 
         public void Update(Person person)
@@ -164,15 +122,13 @@ namespace Inlämning1Sql
             db.ExecuteSQL(@"UPDATE People SET
                             firstName=@firstName, lastName=@lastName,birthDate=@birthDate, deathDate=@deathDate,
                             dadID=@dadID, momID=@momID WHERE ID = @ID",
-                            ("@firstName",person.FirstName),
-                            ("@lastName",person.LastName),
-                            ("@birthDate",person.BirthDate),
+                            ("@firstName", person.FirstName),
+                            ("@lastName", person.LastName),
+                            ("@birthDate", person.BirthDate),
                             ("@deathDate", person.DeathDate),
                             ("@dadID", person.DadID),
                             ("@momID", person.MomID),
                             ("@ID", person.Id));
-
-
         }
 
         internal void CreateDatabase(string name)
@@ -191,7 +147,7 @@ namespace Inlämning1Sql
 
             var sqlCmd = "SELECT COUNT(*) AS data FROM master.dbo.sysdatabases WHERE name=@database";
 
-            var files = db.GetDataTable(sqlCmd, ("@database",databaseName));
+            var files = db.GetDataTable(sqlCmd, ("@database", databaseName));
 
             foreach (DataRow row in files.Rows)
             {
@@ -216,7 +172,6 @@ namespace Inlämning1Sql
 
         internal void AddColumn(string name, string field)
         {
-
             db.DatabaseName = DatabaseName;
             db.ExecuteSQL($"ALTER TABLE People ADD {name} {field};");
         }
@@ -225,7 +180,6 @@ namespace Inlämning1Sql
         {
             db.DatabaseName = DatabaseName;
             db.ExecuteSQL($"ALTER TABLE People DROP COLUMN {name};");
-
         }
 
         internal void CreateTablePeople()
@@ -240,18 +194,14 @@ namespace Inlämning1Sql
                                 [dadID] [int] NULL,
                                 [momID] [int] NULL
                             ) ON [PRIMARY]");
-
-
         }
 
-        public List<Person> List(string filter = "", string orderby = "")
+        public List<Person> List(string filter = "")
         {
             db.DatabaseName = DatabaseName;
 
-            var sqlCmd = "SELECT";
-            sqlCmd += "* FROM People";
+            var sqlCmd = "SELECT * FROM People";
             if (filter != "") sqlCmd += " WHERE " + filter;
-            if (orderby != "") sqlCmd += " ORDER BY " + orderby;
 
             var data = db.GetDataTable(sqlCmd);
             var list = new List<Person>();
@@ -262,19 +212,55 @@ namespace Inlämning1Sql
             return list;
         }
 
-        public List<Person> List2(string filter = "", string orderby = "")
+        public List<Person> UserListFirstLetter(string letter)
         {
             db.DatabaseName = DatabaseName;
 
-            // TODO: Här är det kaoz, måste ha parameterar, fixa sen! 
-            var sqlCmd = "SELECT";
-            sqlCmd += "* FROM People";
-            if (filter != "") sqlCmd += " WHERE firstName = @firstName";
-            if (orderby != "") sqlCmd += " ORDER BY " + orderby;
+            var sqlCmd = @"SELECT * FROM People
+                           WHERE firstName LIKE @firstName + '%' ";
 
-            Console.WriteLine(sqlCmd); 
-            
-            var data = db.GetDataTable(sqlCmd, ("@firstName", filter));
+            var data = db.GetDataTable(sqlCmd, ("@firstName", letter));
+            var list = new List<Person>();
+            foreach (DataRow row in data.Rows)
+            {
+                list.Add(GetPersonObject(row));
+            }
+            return list;
+        }
+
+        public List<Person> UserListWhere(string condition, string value)
+        {
+            db.DatabaseName = DatabaseName;
+            string sqlParamter = "@";
+            sqlParamter += condition;
+
+            var sqlCmd = @$"SELECT * FROM People
+                           WHERE {condition} = {sqlParamter}";
+
+            var data = db.GetDataTable(sqlCmd, (sqlParamter, value));
+            var list = new List<Person>();
+            foreach (DataRow row in data.Rows)
+            {
+                list.Add(GetPersonObject(row));
+            }
+            return list;
+        }
+
+        public List<Person> UserListWhereOr(string condition1, string value1, string condition2, string value2)
+        {
+            db.DatabaseName = DatabaseName;
+            string sqlParamter1 = "@";
+            sqlParamter1 += condition1;
+
+            string sqlParamter2 = "@";
+            sqlParamter2 += condition2;
+
+            var sqlCmd = @$"SELECT * FROM People
+                           WHERE {condition1} = {sqlParamter1} OR {condition2} = {sqlParamter2}";
+
+            var data = db.GetDataTable(sqlCmd,
+                (sqlParamter1, value1),
+                (sqlParamter2, value2));
             var list = new List<Person>();
             foreach (DataRow row in data.Rows)
             {
@@ -295,11 +281,6 @@ namespace Inlämning1Sql
                 MomID = (int)row["momID"],
                 Id = (int)row["ID"]
             };
-
-       
-
-    }
-
-
+        }
     }
 }
