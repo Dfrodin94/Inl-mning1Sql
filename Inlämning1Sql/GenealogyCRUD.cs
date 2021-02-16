@@ -16,14 +16,17 @@ namespace Inlämning1Sql
             if(!DoesPersonExist(person.FirstName)) 
             {
                 db.DatabaseName = DatabaseName;
-                db.ExecuteSQL(@$"INSERT INTO People (firstName, lastName, birthDate, deathDate, momID, dadID)
-                                VALUES(@firstName, @lastName, @birthDate, @deathDate, @momID, @dadID)",
+                db.ExecuteSQL(@$"INSERT INTO People (firstName, lastName, birthDate, deathDate, momID, dadID, 
+                                birthPlace, deathPlace)
+                                VALUES(@firstName, @lastName, @birthDate, @deathDate, @momID, @dadID, @birthPlace, @deathPlace)",
                                 ("@firstName", person.FirstName),
                                 ("@lastName", person.LastName),
                                 ("@birthDate", person.BirthDate),
                                 ("@deathDate", person.DeathDate),
                                 ("@momID",person.MomID),
-                                ("@dadID",person.DadID));                        
+                                ("@dadID",person.DadID),
+                                ("@birthPlace",person.BirthPlace),
+                                ("@deathPlace",person.DeathPlace));                        
             }
             else
             {
@@ -163,14 +166,17 @@ namespace Inlämning1Sql
 
             db.ExecuteSQL(@"UPDATE People SET
                             firstName=@firstName, lastName=@lastName,birthDate=@birthDate, deathDate=@deathDate,
-                            dadID=@dadID, momID=@momID WHERE ID = @ID",
+                            dadID=@dadID, momID=@momID, birthPlace=@birthPlace, deathPlace=@deathPlace WHERE ID = @ID",
                             ("@firstName",person.FirstName),
                             ("@lastName",person.LastName),
                             ("@birthDate",person.BirthDate),
                             ("@deathDate", person.DeathDate),
                             ("@dadID", person.DadID),
                             ("@momID", person.MomID),
-                            ("@ID", person.Id));
+                            ("@ID", person.Id),
+                            ("@birthPlace", person.BirthPlace),
+                            ("@deathPlace", person.DeathPlace));   
+                            
 
 
         }
@@ -214,11 +220,11 @@ namespace Inlämning1Sql
             }
         }
 
-        internal void AddColumn(string name, string field)
+        internal void AddColumnVarchar(string name)
         {
 
             db.DatabaseName = DatabaseName;
-            db.ExecuteSQL($"ALTER TABLE People ADD {name} {field};");
+            db.ExecuteSQL($"ALTER TABLE People ADD {name} [nvarchar](255) NULL;");
         }
 
         internal void DeleteColumn(string name)
@@ -293,7 +299,10 @@ namespace Inlämning1Sql
                 DeathDate = row["deathDate"].ToString(),
                 DadID = (int)row["dadID"],
                 MomID = (int)row["momID"],
-                Id = (int)row["ID"]
+                Id = (int)row["ID"],
+                BirthPlace = row["birthPlace"].ToString(),
+                DeathPlace = row["deathPlace"].ToString()
+                
             };
 
        

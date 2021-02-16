@@ -8,7 +8,7 @@ using System.Text;
 
 namespace Inlämning1Sql
 {
-    class DatabaseSql : GenealogyCRUD
+    class DatabaseSql
     {
         internal string ConnectionString { get; set; } = @"Data Source=.\SQLExpress;Integrated Security=true;database={0}";
         internal string DatabaseName { get; set; } = "Master";
