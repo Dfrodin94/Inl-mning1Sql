@@ -8,7 +8,9 @@ namespace Inlämning1Sql
         static void Main(string[] args)
         {
             GenealogyCRUD crud = new GenealogyCRUD();
-            crud.CreateDatabase("Genealogy");
+            //crud.CreateDatabase("Genealogy");
+            //crud.AddColumnVarchar("birthPlace");
+            //crud.AddColumnVarchar("deathPlace");
             
             /*crud.CreateTablePeople();
             crud.AddColumnVarchar("birthPlace");
@@ -100,7 +102,7 @@ namespace Inlämning1Sql
                 Console.WriteLine(p.ToString());
             }
 
-            Console.WriteLine("");
+            Console.WriteLine();
 
             people = crud.UserListOrderbyBirthPlace();
             foreach (Person p in people)

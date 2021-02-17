@@ -63,7 +63,7 @@ namespace Inlämning1Sql
         public bool DoesPersonExist(string firstName)
         {
             db.DatabaseName = DatabaseName;
-            List<Person> personList = List($"firstName = '{firstName}'");
+            List<Person> personList = List("firstName",firstName);
            
             // TODO ändra till personList[0] sen
             // Fråga mackan om hur man löser det bäst 
@@ -96,20 +96,11 @@ namespace Inlämning1Sql
         public Person GetFather(Person person)
         {
             db.DatabaseName = DatabaseName;
-            List<Person> personList = List($"ID = '{person.DadID}'");
+            List<Person> personList = List("ID", person.DadID.ToString());
             var aPerson = new Person();
 
-            foreach (Person p in personList)
-            {
-                if (p.Id.Equals(person.DadID))
-                {
-                    aPerson = p;
-                }
-
-            }
-
+            aPerson = personList[0];
             return aPerson;
-
 
 
         }
@@ -123,35 +114,11 @@ namespace Inlämning1Sql
         {
 
             db.DatabaseName = DatabaseName;
-            List<Person> personList = List($"ID = '{person.MomID}'");
+            List<Person> personList = List("ID", person.MomID.ToString());
             var aPerson = new Person();
 
-
-            foreach (Person p in personList)
-            {
-                if (p.Id.Equals(person.MomID))
-                {
-                    aPerson = p;
-                }
-
-            }
-
+            aPerson = personList[0];
             return aPerson;
-
-        }
-
-
-        /// <summary>
-        /// Retunerar ett personobjekts barn baserat på dess ID
-        /// </summary>
-        /// <param name="person">vi använder objektets person.Id </param>
-        /// <returns>Person objekt</returns>
-        public List<Person> GetChildren (Person person)
-        {
-
-            db.DatabaseName = DatabaseName;
-            List<Person> personList = List($"momID = '{person.Id}' OR dadID = '{person.Id}'");
-            return personList;
 
         }
 
@@ -185,8 +152,7 @@ namespace Inlämning1Sql
         public void Update(Person person)
         {
             db.DatabaseName = DatabaseName;
-            List($"firstName = '{person.FirstName}'");
-
+          
             db.ExecuteSQL(@"UPDATE People SET
                             firstName=@firstName, lastName=@lastName,birthDate=@birthDate, deathDate=@deathDate,
                             dadID=@dadID, momID=@momID, birthPlace=@birthPlace, deathPlace=@deathPlace WHERE ID = @ID",
@@ -297,18 +263,20 @@ namespace Inlämning1Sql
         /// <summary>
         /// Retunerar en lista fylld med person objekt utifrån en SQL query, används internt inom klassen 
         /// </summary>
-        /// <param name="filter"> det som filtreras </param>
+        /// <param name="condition"> den kolumnen som ska filtreras </param>
+        /// <param name="value"> värdet på det som filtreras ex firstName = 'David' </param>
         /// <returns>List Person</returns>
-        private List<Person> List(string filter = "", string orderby = "")
+
+        public List<Person> List(string condition, string value)
         {
             db.DatabaseName = DatabaseName;
+            string sqlParamter = "@";
+            sqlParamter += condition;
 
-            var sqlCmd = "SELECT";
-            sqlCmd += "* FROM People";
-            if (filter != "") sqlCmd += " WHERE " + filter;
-            if (orderby != "") sqlCmd += " ORDER BY " + orderby;
+            var sqlCmd = @$"SELECT * FROM People
+                           WHERE {condition} = {sqlParamter}";
 
-            var data = db.GetDataTable(sqlCmd);
+            var data = db.GetDataTable(sqlCmd, (sqlParamter, value));
             var list = new List<Person>();
             foreach (DataRow row in data.Rows)
             {
