@@ -13,6 +13,12 @@ namespace Inlämning1Sql
         internal string ConnectionString { get; set; } = @"Data Source=.\SQLExpress;Integrated Security=true;database={0}";
         internal string DatabaseName { get; set; } = "Master";
 
+        /// <summary>
+        /// Retunerar en datatable utifrån en SQL query 
+        /// </summary>
+        /// <param name="sqlString"> SQL queryn</param>
+        /// <param name="parameters"> en touple med stränger som innehåller parametrar och dess värden </param>
+        /// <returns>DataTable object</returns>
         public DataTable GetDataTable(string sqlString, params (string, string)[] parameters)
         {
             var dt = new DataTable();
@@ -40,6 +46,12 @@ namespace Inlämning1Sql
             return dt;
         }
 
+        /// <summary>
+        /// Sätter paramterar i en SQLsträng
+        /// </summary>
+        /// <param name="parameters"> en touple med stränger som innehåller parametrar och dess värden</param>
+        /// <param name="command"> kopplingen med sqlSträngen, redo för värden!  </param>
+
         private static void SetParameters((string, object)[] parameters, SqlCommand command)
         {
             foreach (var item in parameters)
@@ -48,6 +60,12 @@ namespace Inlämning1Sql
             }
         }
 
+        /// <summary>
+        /// Retunerar en long utifrån en SQL query som baserat på antal rader som påverkats  
+        /// </summary>
+        /// <param name="sqlString"> SQL queryn</param>
+        /// <param name="parameters"> en touple med stränger som innehåller parametrar och dess värden </param>
+        /// <returns>DataTable object</returns>
         public long ExecuteSQL(string sqlString, params (string, object)[] parameters)
         {
             long rowsAffacted = 0;

@@ -8,7 +8,7 @@ namespace Inlämning1Sql
 {
     class GenealogyCRUD
     {
-        private DatabaseSql db = new DatabaseSql(); // kanske bättre att bara göra denna statisk? 
+        private DatabaseSql db = new DatabaseSql(); 
         public string DatabaseName { get; set; } = "Genealogy";
 
         /// <summary>
